@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <h1 id="title">Student Data Management System</h1>
+    <div class="fieldset add-form">
+      <form class="form" action="{{ url_for('add_data') }}" method="post">
+        <h3>Add Student</h3>
+        <div class="input-div">
+          <label for="student_id">Id: </label>
+          <input type="text" id="student_id" name="student_id" required />
+        </div>
+        <div class="input-div">
+          <label for="student_name">Name: </label>
+          <input type="text" id="student_name" name="student_name" required />
+        </div>
+        <div class="input-div">
+          <label for="student_branch">Branch: </label>
+          <input
+            type="text"
+            id="student_branch"
+            name="student_branch"
+            required
+          />
+        </div>
+        <div class="input-div">
+          <label for="student_sem">Semester: </label>
+          <input
+            type="number"
+            id="student_sem"
+            name="student_sem"
+            required
+            max="8"
+            min="1"
+          />
+        </div>
+        <div class="input-div">
+          <label for="student_marks">Marks: </label>
+          <input
+            type="number"
+            id="student_marks"
+            name="student_marks"
+            required
+            max="100"
+            min="0"
+          />
+        </div>
+        <button id="add-button">Add Student</button>
+      </form>
+    </div>
+    <h3 class="student-list-title">Students List</h3>
+      <table class="student-list">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Branch</th>
+            <th>Semester</th>
+            <th>Marks</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in data %}
+          <tr>
+            <td>{{ student[0] }}</td>
+            <td>{{ student[1] }}</td>
+            <td>{{ student[2] }}</td>
+            <td>{{ student[3] }}</td>
+            <td>{{ student[4] }}</td>
+            <td><a href="#" onclick="deleteStudent('{{ student[0] }}')">Delete</a> | 
+            <a href="#" onclick="showUpdateForm('{{ student[0] }}')">Update</a></td>
+          </tr>
+          
+          <tr id="updateForm_{{ student[0] }}" style="display: none;">
+            <td colspan="5">
+                <form class="update-form form" action="{{ url_for('update_data', id=student[0]) }}" method="post">
+                    <div class="input-div">
+                        <label for="update_student_name">Name: </label>
+                        <input type="text" id="update_student_name" name="update_student_name" value="{{ student[1] }}" required />
+                    </div>
+                    <div class="input-div">
+                        <label for="update_student_branch">Branch: </label>
+                        <input type="text" id="update_student_branch" name="update_student_branch" value="{{ student[2] }}" required />
+                    </div>
+                    <div class="input-div">
+                        <label for="update_student_sem">Semester: </label>
+                        <input type="number" id="update_student_sem" name="update_student_sem" value="{{ student[3] }}" required max="8" min="1" />
+                    </div>
+                    <div class="input-div">
+                        <label for="update_student_marks">Marks: </label>
+                        <input type="number" id="update_student_marks" name="update_student_marks" value="{{ student[4] }}" required max="100" min="0" />
+                    </div>
+                    <button type="submit">Update</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+      <script>
+        function deleteStudent(id) {
+            if (confirm("Are you sure you want to delete this student?")) {
+                fetch('/delete/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({id: id})
+                })
+                .then(() => {
+                    window.location.href = '/';
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+
+        function showUpdateForm(id) {
+          document.querySelectorAll('[id^="updateForm_"]').forEach(form => {
+              form.style.display = 'none';
+          });
+          document.getElementById('updateForm_' + id).style.display = 'table-row';
+      }
+      var message = "{{ message }}";
+      if (message.trim() !== '') {
+          alert(message);
+      }
+
+    </script>
+    
+  </body>
+</html>
