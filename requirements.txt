@@ -1,3 +1,2 @@
 Flask
-sqlite3
 Gunicorn
